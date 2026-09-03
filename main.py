@@ -59,6 +59,26 @@ def secret(name: str, default: str = "") -> str:
         return default
 
 
+def secrets_report() -> tuple[str, list[str]]:
+    """Describe the secrets store without ever revealing a value.
+
+    A key that silently reads as empty is indistinguishable from one that was
+    never set, which makes a misconfigured deployment look like a broken app.
+    This reports the *shape* of the store - names only, never values - so the
+    difference is visible from inside the running app.
+    """
+    try:
+        keys = sorted(st.secrets.keys())  # type: ignore[union-attr]
+    except FileNotFoundError:
+        return "missing", []
+    except Exception as exc:  # noqa: BLE001 - malformed TOML lands here
+        return f"error: {type(exc).__name__}: {exc}", []
+
+    if not keys:
+        return "empty", []
+    return "ok", [str(k) for k in keys]
+
+
 # Which keys this particular deployment ships. A public demo may reasonably
 # provide the cheap answering key and ask visitors for the expensive one.
 GEMINI_PRESET = secret("GEMINI_API_KEY")
@@ -195,6 +215,29 @@ with st.sidebar:
         f"**Vector DB** Weaviate v4 (BYO vectors)  \n"
         f"**LLM** Nebius Token Factory"
     )
+
+    with st.expander("🩺 Deployment diagnostics", expanded=False):
+        status, names = secrets_report()
+        if status == "missing":
+            st.write("**Secrets:** none configured — this deployment ships no keys.")
+        elif status == "empty":
+            st.write("**Secrets:** a secrets store exists but contains no keys.")
+        elif status.startswith("error"):
+            st.write(f"**Secrets:** could not be parsed. `{status}`")
+            st.caption(
+                "Usually a TOML syntax problem: each line must read "
+                "`NAME = \"value\"` with the value in double quotes, and no "
+                "`[section]` header above it."
+            )
+        else:
+            st.write(f"**Secrets loaded:** `{'`, `'.join(names)}`")
+        st.caption("Key names only. Values are never displayed.")
+
+        st.write(
+            f"**Resolved:** Gemini {'✅' if GEMINI_PRESET else '—'} · "
+            f"Nebius {'✅' if NEBIUS_PRESET else '—'} · "
+            f"ffmpeg {'✅' if ffmpeg_available() else '❌'}"
+        )
 
 
 # --------------------------------------------------------------------- head
