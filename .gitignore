@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.Python
+build/
+dist/
+
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Local data
+weaviate_data/
+*.mp4
+*.mov
+*.mkv
+*.webm
+!assets/*.mp4
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.DS_Store
+.idea/
+.vscode/

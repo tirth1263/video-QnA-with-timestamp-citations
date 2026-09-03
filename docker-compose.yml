@@ -1,0 +1,20 @@
+# Local Weaviate for development:  docker compose up -d
+services:
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.27.0
+    container_name: weaviate
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    restart: on-failure
+    environment:
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      DEFAULT_VECTORIZER_MODULE: "none"
+      ENABLE_MODULES: ""
+      QUERY_DEFAULTS_LIMIT: 25
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
+volumes:
+  weaviate_data:

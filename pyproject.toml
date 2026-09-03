@@ -1,0 +1,29 @@
+[project]
+name = "video-qna-timestamp-citations"
+version = "1.0.0"
+description = "Ask questions about a video and get answers with clickable timestamp citations, powered by Gemini native multimodal embeddings, Weaviate, and Nebius."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "tirth1263" }]
+keywords = ["rag", "video", "multimodal", "embeddings", "weaviate", "gemini", "nebius", "streamlit"]
+
+dependencies = [
+    "streamlit>=1.40",
+    "google-genai>=1.0",
+    "weaviate-client>=4.10",
+    "openai>=1.60",
+    "python-dotenv>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/tirth1263/video-QnA-with-timestamp-citations"
+Repository = "https://github.com/tirth1263/video-QnA-with-timestamp-citations"
+
+[tool.ruff]
+line-length = 90
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
