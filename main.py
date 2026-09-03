@@ -36,6 +36,8 @@ NEBIUS_MODELS = [
 
 ACCEPTED_TYPES = ["mp4", "mov", "mkv", "webm"]
 
+GEMINI_KEY_URL = "https://aistudio.google.com/apikey"
+
 st.set_page_config(
     page_title="Video Q&A with Timestamp Citations",
     page_icon="🎬",
@@ -55,6 +57,28 @@ def secret(name: str, default: str = "") -> str:
         return str(st.secrets[name])  # type: ignore[index]
     except Exception:
         return default
+
+
+# Which keys this particular deployment ships. A public demo may reasonably
+# provide the cheap answering key and ask visitors for the expensive one.
+GEMINI_PRESET = secret("GEMINI_API_KEY")
+NEBIUS_PRESET = secret("NEBIUS_API_KEY")
+
+
+def key_field(label: str, preset: str, help_text: str, used_for: str) -> str:
+    """Render a key input, or a confirmation when the deployment supplies it.
+
+    A deployment can ship some keys and not others - shipping only the cheap
+    one is a reasonable way to run a public demo. When a key is already
+    present, asking for it again just makes visitors think it is missing.
+    """
+    if not preset:
+        return st.text_input(label, value="", type="password", help=help_text)
+
+    st.markdown(f"✅ **{label}** — provided, used for {used_for}.")
+    if not st.checkbox(f"Use my own {label.split()[0]} key instead", key=f"own_{label}"):
+        return preset
+    return st.text_input(label, value="", type="password", help=help_text) or preset
 
 
 def init_state() -> None:
@@ -109,18 +133,18 @@ init_state()
 with st.sidebar:
     st.markdown("### ⚙️ Configuration")
 
-    with st.expander("🔑 API keys", expanded=not secret("GEMINI_API_KEY")):
-        gemini_key = st.text_input(
-            "Gemini API key",
-            value=secret("GEMINI_API_KEY"),
-            type="password",
-            help="Free key from https://aistudio.google.com/apikey",
+    with st.expander("🔑 API keys", expanded=not GEMINI_PRESET):
+        gemini_key = key_field(
+            label="Gemini API key",
+            preset=GEMINI_PRESET,
+            help_text="Free key from https://aistudio.google.com/apikey",
+            used_for="embedding clips and your questions",
         )
-        nebius_key = st.text_input(
-            "Nebius API key",
-            value=secret("NEBIUS_API_KEY"),
-            type="password",
-            help="Get one at https://dub.sh/nebius",
+        nebius_key = key_field(
+            label="Nebius API key",
+            preset=NEBIUS_PRESET,
+            help_text="Get one at https://dub.sh/nebius",
+            used_for="writing the cited answer",
         )
 
     with st.expander("🗄️ Weaviate", expanded=False):
@@ -182,6 +206,16 @@ st.markdown(
     "question, so retrieval is a single vector search - no transcription "
     "service, no frame-level CLIP."
 )
+
+if NEBIUS_PRESET and not GEMINI_PRESET and not gemini_key:
+    st.info(
+        f"**One thing before you start: paste a Gemini API key in the sidebar.** "
+        f"It is free at [aistudio.google.com/apikey]({GEMINI_KEY_URL}) and takes "
+        "about a minute. That key embeds your video, which is the part that "
+        "costs real money — so it runs on your quota, not this demo's. "
+        "The answer model is already provided.",
+        icon="🔑",
+    )
 
 if not ffmpeg_available():
     st.error(

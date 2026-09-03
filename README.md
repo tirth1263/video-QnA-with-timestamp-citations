@@ -250,7 +250,17 @@ All settings are available in the sidebar at runtime, and every one of them can 
 2. Repository `tirth1263/video-QnA-with-timestamp-citations`, branch `main`, main file `main.py`.
 3. Click **Deploy**.
 
-Secrets are optional. Under *Advanced settings → Secrets* you can pre-fill keys using the format in [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example) — but if you leave them blank, every visitor simply pastes their own keys into the sidebar, which is the safer choice for a public demo.
+Secrets are optional, and you can ship *some* of them. Whatever you provide under *Settings → Secrets* the app uses silently; whatever you omit it asks the visitor for. See [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example).
+
+| You ship | Visitor supplies | Who pays |
+|---|---|---|
+| nothing | both keys | the visitor |
+| `NEBIUS_API_KEY` | Gemini key only | you pay for answers, visitor pays for embedding |
+| both keys | nothing | you, for every visitor |
+
+**Shipping only the Nebius key is the sweet spot for a public demo.** Answering costs a handful of tokens per question, while embedding is the expensive half — a 10-minute video at 20s clips is ~60 Gemini calls from one visitor, one time. The live demo above runs in exactly this mode: ask away for free, bring your own (free) Gemini key to ingest a video.
+
+Whichever mode you pick, set a spend cap on the keys you ship.
 
 ### Why not Vercel / Netlify?
 
