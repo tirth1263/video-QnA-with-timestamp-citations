@@ -252,6 +252,19 @@ All settings are available in the sidebar at runtime, and every one of them can 
 
 Secrets are optional. Under *Advanced settings → Secrets* you can pre-fill keys using the format in [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example) — but if you leave them blank, every visitor simply pastes their own keys into the sidebar, which is the safer choice for a public demo.
 
+### Why not Vercel / Netlify?
+
+Streamlit is a **long-lived server** that holds an open WebSocket to every viewer. Vercel and Netlify run **short-lived serverless functions** that must export an ASGI/WSGI callable and return a single response. There is no `app` object to export and nothing to keep alive, which is exactly what this error means:
+
+```
+Error: Found main.py but it does not export a top-level "app",
+"application", or "handler" variable.
+```
+
+That is not a misconfiguration you can patch with a `vercel.json` — the execution models are incompatible. Ingestion also runs for minutes and shells out to `ffmpeg`, neither of which fits a serverless function's timeout or image.
+
+Use a host that runs a persistent process: **Streamlit Community Cloud** (above), Hugging Face Spaces, Render, Railway, or Fly.io. The included `docker-compose.yml` and `packages.txt` cover the container-based options.
+
 > ⚠️ **On hosted deployments there is no Docker, so no local Weaviate.** Point `WEAVIATE_URL` at a [Weaviate Cloud](https://console.weaviate.cloud/) cluster for persistence, or leave it unset and the app will use its in-memory vector store — fully functional, but the index is cleared when the session ends.
 
 ---
