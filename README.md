@@ -4,14 +4,14 @@
 
 ### Ask a video anything. Get an answer that cites the exact second — and click to jump there.
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](LIVE_APP_URL)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://video-qna-timestamp-citations.streamlit.app)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Gemini](https://img.shields.io/badge/Gemini-embedding--2--preview-4285F4?logo=google&logoColor=white)](https://ai.google.dev/gemini-api/docs/models/gemini-embedding-2-preview)
 [![Weaviate](https://img.shields.io/badge/Weaviate-v4-00C9A7)](https://weaviate.io/)
 [![Nebius](https://img.shields.io/badge/Nebius-Token%20Factory-1E88E5)](https://dub.sh/nebius)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**[🚀 Try the live app](LIVE_APP_URL)** · [How it works](#-how-it-works) · [Quickstart](#-quickstart) · [Architecture](#-architecture)
+**[🚀 Try the live app](https://video-qna-timestamp-citations.streamlit.app)** · [How it works](#-how-it-works) · [Quickstart](#-quickstart) · [Architecture](#-architecture)
 
 </div>
 
@@ -237,6 +237,22 @@ All settings are available in the sidebar at runtime, and every one of them can 
 | Answers say "the excerpts do not cover that" | Retrieval found nothing relevant. Raise *clips retrieved per question*, or re-ingest with shorter clips. |
 | Ingest is slow | Each clip is one embedding call plus one description call. Use longer clips, or switch off clip descriptions in the sidebar. |
 | Timestamps feel imprecise | Lower the clip length. A 60s clip can only ever cite to within a minute. |
+
+---
+
+## ☁️ Deploy your own
+
+[![Deploy to Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=tirth1263%2Fvideo-QnA-with-timestamp-citations&branch=main&mainModule=main.py)
+
+**One click, then three fields.** The repo already ships everything Streamlit Community Cloud needs — `requirements.txt` for Python deps and `packages.txt` so `ffmpeg` is installed at build time.
+
+1. Click the badge above (or go to [share.streamlit.io/deploy](https://share.streamlit.io/deploy?repository=tirth1263%2Fvideo-QnA-with-timestamp-citations&branch=main&mainModule=main.py)) and sign in with GitHub.
+2. Repository `tirth1263/video-QnA-with-timestamp-citations`, branch `main`, main file `main.py`.
+3. Click **Deploy**.
+
+Secrets are optional. Under *Advanced settings → Secrets* you can pre-fill keys using the format in [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example) — but if you leave them blank, every visitor simply pastes their own keys into the sidebar, which is the safer choice for a public demo.
+
+> ⚠️ **On hosted deployments there is no Docker, so no local Weaviate.** Point `WEAVIATE_URL` at a [Weaviate Cloud](https://console.weaviate.cloud/) cluster for persistence, or leave it unset and the app will use its in-memory vector store — fully functional, but the index is cleared when the session ends.
 
 ---
 
